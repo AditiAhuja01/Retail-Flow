@@ -41,49 +41,33 @@ To optimize analytical query performance, the flat transaction data is normalize
 
 ---
 
-## 📊 3. Key SQL Insights & Business Analytics
-We run standard SQL analytical queries (using `JOIN`s, aggregations, `CASE` statements, and `CTE`s) in [`run_analytics.py`](file:///c:/Users/Aditi%20Ahuja/CV-Projects/neoretail_pipeline/src/run_analytics.py) to answer critical retail questions:
+## 3. Key SQL Insights & Business Analytics
+We run analytical SQL queries in [`run_analytics.py`](file:///c:/Users/Aditi%20Ahuja/CV-Projects/neoretail_pipeline/src/run_analytics.py) to answer critical retail questions:
 
-1. **Category Performance:** Which product category generates the most net revenue, and which has the highest return rate?
-2. **Customer Lifetime Value (LTV):** Who are our top 10 most profitable customers?
-3. **RFM Segmentation:** Grouping customers into *Champions, Lost, At-Risk,* and *Active* based on their Recency, Frequency, and Monetary metrics.
+1. **Monthly Seasonality:** Joins `fact_sales` with `dim_dates` to evaluate order volumes and month-over-month growth.
+2. **Category Performance & Reverse Logistics:** Computes net revenue and return rate percentages (`CAST(SUM(is_returned) AS REAL) / COUNT(*) * 100`) across product categories.
+3. **Customer Lifetime Value (LTV):** Identifies top VIP customers while filtering out return credit notes (`WHERE is_returned = 0`).
+4. **Customer Frequency Segmentation:** Classifies customers into *VIP Customers (5+ orders)*, *Repeat Customers (2-4 orders)*, and *One-Time Customers (1 order)* using conditional `CASE WHEN` statements.
 
 ---
 
-## 🚀 4. How to Run the Pipeline
+## 4. Quickstart Guide
 
-### Step 1: Install Dependencies
-Install the required Python packages:
+### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 2: Run Ingestion & Currency Conversion (Extract)
-Downloads the 45MB raw transaction CSV and calls the live API for conversion rates:
+### 2. Execute Data Pipeline
+Run the ETL scripts in order:
 ```bash
 python src/download_data.py
-```
-
-### Step 3: Clean & Standardize Data (Transform)
-Removes duplicate rows, formats dates, strips whitespace, and isolates error records:
-```bash
 python src/validation.py
-```
-
-### Step 4: Build Data Warehouse Schema (Load)
-Builds the relational Star Schema and loads tables with indexes:
-```bash
 python src/db_pipeline.py
-```
-
-### Step 5: Execute Business Analytics
-Runs all SQL analytical scripts and exports metrics:
-```bash
 python src/run_analytics.py
 ```
 
-### Step 6: Start Dashboard
-Launch the visual Streamlit dashboard:
+### 3. Launch the Dashboard
 ```bash
 streamlit run app.py
 ```

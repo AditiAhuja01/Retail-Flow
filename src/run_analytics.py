@@ -45,8 +45,6 @@ def run_analytical_queries():
     print("Running Query 2: Monthly Net Revenue Trends...")
     q_monthly = """
         SELECT 
-            d.year,
-            d.month,
             d.year || '-' || printf('%02d', d.month) AS year_month,
             COUNT(DISTINCT f.invoice_no) AS total_orders,
             ROUND(SUM(f.amount_inr), 2) AS net_revenue_inr
@@ -56,6 +54,8 @@ def run_analytical_queries():
         ORDER BY d.year, d.month;
     """
     df_monthly = pd.read_sql(q_monthly, conn)
+    # Simple 1-line monthly growth percentage
+    df_monthly['mom_growth_percent'] = round(df_monthly['net_revenue_inr'].pct_change() * 100, 2)
     df_monthly.to_csv(os.path.join(REPORTS_DIR, "monthly_trends.csv"), index=False)
 
     # -------------------------------------------------------------
@@ -102,53 +102,31 @@ def run_analytical_queries():
     df_ltv.to_csv(os.path.join(REPORTS_DIR, "top_10_customers_ltv.csv"), index=False)
 
     # -------------------------------------------------------------
-    # Query 5: Simple RFM Customer Segmentation (CTE Query)
+    # Query 5: Customer Purchase Frequency & Segmentation
     # -------------------------------------------------------------
-    # This query uses a CTE to calculate:
-    # - Recency: Days since the last purchase relative to the end of the dataset
-    # - Frequency: Number of unique invoices
-    # - Monetary: Total net spending
-    # Then it classifies them based on simple rules.
-    print("Running Query 5: RFM Customer Segmentation...")
+    print("Running Query 5: Customer Segmentation...")
     q_rfm = """
-        WITH customer_rfm AS (
-            SELECT 
-                customer_id,
-                
-                -- Recency: Days between the customer's last order and the final date in the dataset (2011-12-09)
-                JULIANDAY('2011-12-09') - JULIANDAY(MAX(d.full_date)) AS recency_days,
-                
-                -- Frequency: Total orders placed
-                COUNT(DISTINCT invoice_no) AS frequency,
-                
-                -- Monetary: Net spend
-                SUM(amount_inr) AS monetary_value
-            FROM fact_sales f
-            JOIN dim_dates d ON f.date_key = d.date_key
-            WHERE is_returned = 0 -- Base RFM on actual successful sales
-            GROUP BY customer_id
-        )
         SELECT 
             customer_id,
-            ROUND(recency_days, 1) AS recency_days,
-            frequency,
-            ROUND(monetary_value, 2) AS monetary_value,
+            COUNT(DISTINCT invoice_no) AS frequency,
+            ROUND(SUM(amount_inr), 2) AS monetary_value,
             
-            -- Categorize customers based on simple rules
+            -- Simple, intuitive customer categorization
             CASE 
-                WHEN recency_days <= 30 AND frequency >= 5 THEN 'Champions (Loyal & Frequent)'
-                WHEN recency_days > 180 THEN 'Lost Customers (Hibernating)'
-                WHEN recency_days > 90 AND recency_days <= 180 THEN 'At-Risk (Needs Attention)'
-                ELSE 'Active/Average Customers'
+                WHEN COUNT(DISTINCT invoice_no) >= 5 THEN 'VIP Customer (5+ Orders)'
+                WHEN COUNT(DISTINCT invoice_no) >= 2 THEN 'Repeat Customer (2-4 Orders)'
+                ELSE 'One-Time Customer (1 Order)'
             END AS customer_segment
-        FROM customer_rfm
+        FROM fact_sales
+        WHERE is_returned = 0
+        GROUP BY customer_id
         ORDER BY monetary_value DESC;
     """
     df_rfm = pd.read_sql(q_rfm, conn)
     df_rfm.to_csv(os.path.join(REPORTS_DIR, "rfm_segmentation.csv"), index=False)
 
     conn.close()
-    print("✅ All analytical reports successfully calculated and saved in /reports folder!")
+    print("All analytical reports successfully calculated and saved in /reports folder!")
 
 if __name__ == "__main__":
     run_analytical_queries()
