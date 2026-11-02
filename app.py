@@ -275,17 +275,18 @@ with tab1:
         col_m1, col_m2 = st.columns([3, 2])
         
         with col_m1:
-            st.markdown('<div class="chart-title">Monthly Net Revenue (INR)</div>', unsafe_allow_html=True)
+            st.markdown('<div class="chart-title">Monthly Net Revenue (Rs. Cr)</div>', unsafe_allow_html=True)
+            df_monthly['net_revenue_cr'] = df_monthly['net_revenue_inr'] / 1e7
             fig_monthly = px.area(
                 df_monthly,
                 x='year_month',
-                y='net_revenue_inr',
-                labels={'year_month': 'Month', 'net_revenue_inr': 'Net Revenue (INR)'}
+                y='net_revenue_cr',
+                labels={'year_month': 'Month', 'net_revenue_cr': 'Net Revenue (Rs. Cr)'}
             )
             fig_monthly.update_traces(
                 line_color='#334155',
                 fillcolor='rgba(51, 65, 85, 0.08)',
-                hovertemplate="<b>%{x}</b><br>Net Revenue: Rs. %{y:,.2f}<extra></extra>"
+                hovertemplate="<b>%{x}</b><br>Net Revenue: Rs. %{y:.2f} Cr<extra></extra>"
             )
             fig_monthly.update_layout(
                 paper_bgcolor="#FFFFFF",
@@ -301,8 +302,9 @@ with tab1:
                 yaxis=dict(
                     showgrid=True,
                     gridcolor='#E2E8F0',
+                    ticksuffix=" Cr",
                     tickfont=dict(color="#0F172A", size=12, family="sans-serif"),
-                    title=dict(text="Net Revenue (INR)", font=dict(color="#0F172A", size=13))
+                    title=dict(text="Net Revenue (Rs. Cr)", font=dict(color="#0F172A", size=13))
                 )
             )
             st.plotly_chart(fig_monthly, use_container_width=True)
@@ -338,23 +340,27 @@ with tab2:
         col_c1, col_c2 = st.columns(2)
 
         with col_c1:
-            st.markdown('<div class="chart-title">Sales by Product Category (INR)</div>', unsafe_allow_html=True)
+            st.markdown('<div class="chart-title">Sales by Product Category (Rs. Cr)</div>', unsafe_allow_html=True)
+            df_category['net_revenue_cr'] = df_category['net_revenue_inr'] / 1e7
             fig_cat_rev = px.bar(
                 df_category,
                 x='category',
-                y='net_revenue_inr',
-                labels={'category': 'Category', 'net_revenue_inr': 'Net Revenue'}
+                y='net_revenue_cr',
+                labels={'category': 'Category', 'net_revenue_cr': 'Net Sales (Rs. Cr)'}
             )
             fig_cat_rev.update_traces(
                 marker_color='#334155',
-                hovertemplate="<b>%{x}</b><br>Sales: Rs. %{y:,.2f}<extra></extra>"
+                texttemplate="Rs. %{y:.1f} Cr",
+                textposition="outside",
+                textfont=dict(color="#0F172A", size=11, family="sans-serif"),
+                hovertemplate="<b>%{x}</b><br>Sales: Rs. %{y:.2f} Cr<extra></extra>"
             )
             fig_cat_rev.update_layout(
                 paper_bgcolor="#FFFFFF",
                 plot_bgcolor="#FFFFFF",
                 font=dict(color="#0F172A", family="sans-serif", size=12),
                 height=350,
-                margin=dict(l=20, r=20, t=20, b=25),
+                margin=dict(l=20, r=20, t=30, b=25),
                 xaxis=dict(
                     showgrid=False,
                     tickangle=0,
@@ -364,8 +370,9 @@ with tab2:
                 yaxis=dict(
                     showgrid=True,
                     gridcolor='#E2E8F0',
+                    ticksuffix=" Cr",
                     tickfont=dict(color="#0F172A", size=11, family="sans-serif"),
-                    title=dict(text="Net Revenue (INR)", font=dict(color="#0F172A", size=13))
+                    title=dict(text="Net Sales (Rs. Cr)", font=dict(color="#0F172A", size=13))
                 )
             )
             st.plotly_chart(fig_cat_rev, use_container_width=True)
