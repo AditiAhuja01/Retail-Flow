@@ -6,9 +6,7 @@ An automated data platform and dimensional warehouse that processes 540,000+ tra
 
 ---
 
-## Dashboard Preview
 
-<!-- Replace with your dashboard screenshot path, e.g. docs/dashboard_preview.png -->
 ## Dashboard Preview
 
 ### Revenue Trends
