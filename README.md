@@ -2,14 +2,23 @@
 
 An automated data platform and dimensional warehouse that processes 540,000+ transaction records, normalizes international sales to INR via live Forex REST API, and delivers net revenue and customer retention analytics on an executive dashboard.
 
-[Live Dashboard](https://retail-flow.streamlit.app) | [GitHub Repository](https://github.com/AditiAhuja01/retail-flow)
+[Dashboard](https://retail-flow.streamlit.app) 
 
 ---
 
 ## Dashboard Preview
 
 <!-- Replace with your dashboard screenshot path, e.g. docs/dashboard_preview.png -->
-![RetailFlow Dashboard Preview](docs/dashboard_preview.png)
+## Dashboard Preview
+
+### Revenue Trends
+![Revenue Trends](revenue-trends.png)
+
+### Product Returns
+![Product Returns](product-returns.png)
+
+### Customer Segments
+![Customer Segments](customer-segments.png)
 
 ---
 
