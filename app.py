@@ -311,7 +311,7 @@ with tab1:
 
         with col_m2:
             st.markdown('<div class="chart-title">Month-by-Month Growth Table</div>', unsafe_allow_html=True)
-            disp_m = df_monthly.copy()
+            disp_m = df_monthly[['year_month', 'total_orders', 'net_revenue_inr', 'mom_growth_percent']].copy()
             disp_m.columns = ['Month', 'Orders', 'Net Revenue', 'Growth (%)']
             st.dataframe(
                 disp_m.style.format({
@@ -414,7 +414,7 @@ with tab2:
             st.plotly_chart(fig_cat_ret, use_container_width=True)
 
         st.markdown('<div class="chart-title">Detailed Category Numbers</div>', unsafe_allow_html=True)
-        disp_cat = df_category.copy()
+        disp_cat = df_category[['category', 'transactions_count', 'net_revenue_inr', 'return_rate_percent']].copy()
         disp_cat.columns = ['Category', 'Orders Count', 'Net Revenue', 'Return Rate (%)']
         st.dataframe(
             disp_cat.style.format({
