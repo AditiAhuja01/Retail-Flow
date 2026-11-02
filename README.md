@@ -1,6 +1,6 @@
 # RetailFlow
 
-An automated batch ETL pipeline and dimensional data warehouse that processes 540,000+ transaction records, normalizes international sales to INR via live Forex REST API, and delivers net revenue and customer retention analytics on an executive dashboard.
+An automated data platform and dimensional warehouse that processes 540,000+ transaction records, normalizes international sales to INR via live Forex REST API, and delivers net revenue and customer retention analytics on an executive dashboard.
 
 [Live Dashboard](https://retail-flow.streamlit.app) | [GitHub Repository](https://github.com/AditiAhuja01/retail-flow)
 
@@ -23,7 +23,7 @@ Retail platforms face significant profit leakage and reporting inaccuracy due to
 
 ---
 
-## 2. Pipeline Architecture
+## 2. System Architecture & Data Flow
 
 ```mermaid
 flowchart LR
@@ -35,7 +35,7 @@ flowchart LR
     F --> G["Streamlit Dashboard<br>Executive UI"]
 ```
 
-### Pipeline Stages
+### Workflow Stages
 1. **Ingestion & Normalization (`download_data.py`):** Downloads raw transaction data and queries the `open.er-api.com` REST API for current exchange rates.
 2. **Validation & Quarantine (`validation.py`):** Deduplicates records and routes 135,077 non-compliant rows (missing Customer IDs, zero-value prices) into an auditable quarantine file.
 3. **Star Schema Modeling (`db_pipeline.py`):** Normalizes 401,564 clean line-items into indexed Fact and Dimension tables in SQLite with referential integrity enabled.
@@ -90,7 +90,7 @@ git clone https://github.com/AditiAhuja01/retail-flow.git
 cd retail-flow
 pip install -r requirements.txt
 
-# 2. Run data pipeline
+# 2. Run data workflow
 python src/download_data.py
 python src/validation.py
 python src/db_pipeline.py
