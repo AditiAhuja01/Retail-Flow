@@ -9,17 +9,20 @@ import plotly.graph_objects as go
 # Page Configuration (Full Screen Width)
 # -------------------------------------------------------------
 st.set_page_config(
-    page_title="RetailFlow | Executive Analytics",
+    page_title="RetailFlow | E-Commerce Data Pipeline",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 # -------------------------------------------------------------
-# Clean Light Theme Styling
+# Simple Minimalist White & Grey Theme Styling
 # -------------------------------------------------------------
 st.markdown("""
     <style>
-        /* Make content use full screen comfortably */
+        /* Base page background: clean soft grey/white */
+        .stApp {
+            background-color: #F8FAFC;
+        }
         .block-container {
             padding-top: 1.5rem;
             padding-bottom: 2.5rem;
@@ -27,30 +30,31 @@ st.markdown("""
             padding-right: 2.5rem;
             max-width: 96% !important;
         }
-        /* Top Status Pills */
+        /* Top Status Pills (Minimal grey border) */
         .status-pill {
             display: inline-block;
             padding: 5px 12px;
             border-radius: 6px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 500;
-            background-color: #F1F5F9;
-            color: #334155;
-            border: 1px solid #CBD5E1;
-            margin-right: 10px;
+            background-color: #FFFFFF;
+            color: #475569;
+            border: 1px solid #E2E8F0;
+            margin-right: 8px;
             margin-bottom: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
         }
-        /* Top KPI Metric Cards */
+        /* Minimalist White Metric Cards */
         .kpi-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 8px;
             padding: 16px 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
             min-height: 110px;
         }
         .kpi-label {
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: #64748B;
             text-transform: uppercase;
@@ -64,7 +68,7 @@ st.markdown("""
             line-height: 1.2;
         }
         .kpi-sub {
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: #64748B;
             margin-top: 4px;
         }
@@ -73,7 +77,7 @@ st.markdown("""
             font-weight: 600;
         }
         .kpi-positive {
-            color: #059669;
+            color: #0F172A;
             font-weight: 600;
         }
         /* Chart container card */
@@ -82,40 +86,41 @@ st.markdown("""
             border: 1px solid #E2E8F0;
             border-radius: 8px;
             padding: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
             margin-bottom: 12px;
         }
         .chart-title {
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 600;
             color: #1E293B;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
-        /* Simple observation box */
+        /* Simple observation box in clean grey */
         .simple-box {
-            background-color: #F8FAFC;
-            border-left: 4px solid #2563EB;
+            background-color: #FFFFFF;
+            border-left: 4px solid #334155;
             border-radius: 0 6px 6px 0;
-            padding: 16px 20px;
+            padding: 14px 18px;
             margin-top: 16px;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             color: #334155;
             line-height: 1.6;
             border-top: 1px solid #E2E8F0;
             border-right: 1px solid #E2E8F0;
             border-bottom: 1px solid #E2E8F0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
         }
-        /* Tabs styling */
+        /* Clean minimalist tabs */
         button[data-baseweb="tab"] {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 500;
-            color: #475569;
-            padding: 0.6rem 1.5rem;
+            color: #64748B;
+            padding: 0.6rem 1.4rem;
         }
         button[data-baseweb="tab"][aria-selected="true"] {
-            color: #2563EB !important;
+            color: #0F172A !important;
             font-weight: 600;
-            border-bottom-color: #2563EB !important;
+            border-bottom-color: #0F172A !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -167,17 +172,28 @@ df_rfm = load_report("rfm_segmentation.csv")
 forex_rate = get_forex_rate()
 
 # -------------------------------------------------------------
-# Header
+# Classy Header with Logo & Title
 # -------------------------------------------------------------
-st.title("RetailFlow Analytics Platform")
-st.caption("End-to-end data pipeline processing 540,000+ retail sales records into a Star Schema data warehouse.")
+st.markdown("""
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+        <div style="background: linear-gradient(135deg, #1E293B, #334155); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+        </div>
+        <div>
+            <div style="font-size: 1.85rem; font-weight: 700; color: #0F172A; line-height: 1.1; letter-spacing: -0.5px;">RetailFlow</div>
+            <div style="font-size: 0.86rem; color: #64748B; margin-top: 3px;">Automated E-Commerce Data Pipeline & Dimensional Warehouse</div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
-# Status Bar
+# Status Pills (Minimalist White & Grey)
 st.markdown(f"""
     <div>
         <span class="status-pill"><b>Pipeline Status:</b> Active (SQLite Warehouse)</span>
         <span class="status-pill"><b>Data Quality:</b> 401,564 Clean | 135,077 Quarantined (24.9%)</span>
-        <span class="status-pill"><b>Live Currency Rate:</b> 1 GBP = Rs. {forex_rate:.2f}</span>
+        <span class="status-pill"><b>Live Currency API:</b> 1 GBP = Rs. {forex_rate:.2f}</span>
     </div>
 """, unsafe_allow_html=True)
 
@@ -188,7 +204,7 @@ if df_summary is None:
     st.stop()
 
 # -------------------------------------------------------------
-# Top KPI Metric Cards (Aligned)
+# Top 4 KPI Metric Cards (White & Grey Minimalist)
 # -------------------------------------------------------------
 total_orders = int(df_summary.loc[0, 'total_orders'])
 gross_sales = float(df_summary.loc[0, 'gross_sales_inr'])
@@ -203,7 +219,7 @@ with k1:
         <div class="kpi-card">
             <div class="kpi-label">Total Orders</div>
             <div class="kpi-value">{total_orders:,}</div>
-            <div class="kpi-sub">Distinct invoices</div>
+            <div class="kpi-sub">Completed invoices</div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -221,14 +237,14 @@ with k3:
         <div class="kpi-card">
             <div class="kpi-label">Refund Losses (Returns)</div>
             <div class="kpi-value">{format_inr(-refund_losses)}</div>
-            <div class="kpi-sub"><span class="kpi-loss">{refund_rate:.2f}%</span> of total sales refunded</div>
+            <div class="kpi-sub"><span class="kpi-loss">{refund_rate:.2f}%</span> of gross volume</div>
         </div>
     """, unsafe_allow_html=True)
 
 with k4:
     st.markdown(f"""
         <div class="kpi-card">
-            <div class="kpi-label">Net Sales Revenue</div>
+            <div class="kpi-label">Net Realized Revenue</div>
             <div class="kpi-value">{format_inr(net_revenue)}</div>
             <div class="kpi-sub"><span class="kpi-positive">Actual money made</span></div>
         </div>
@@ -261,8 +277,8 @@ with tab1:
                 labels={'year_month': 'Month', 'net_revenue_inr': 'Net Revenue (INR)'}
             )
             fig_monthly.update_traces(
-                line_color='#2563EB',
-                fillcolor='rgba(37, 99, 235, 0.12)',
+                line_color='#334155',
+                fillcolor='rgba(51, 65, 85, 0.08)',
                 hovertemplate="<b>%{x}</b><br>Net Revenue: Rs. %{y:,.2f}<extra></extra>"
             )
             fig_monthly.update_layout(
@@ -313,7 +329,7 @@ with tab2:
                 labels={'category': 'Category', 'net_revenue_inr': 'Net Revenue'}
             )
             fig_cat_rev.update_traces(
-                marker_color='#2563EB',
+                marker_color='#334155',
                 hovertemplate="<b>%{x}</b><br>Sales: Rs. %{y:,.2f}<extra></extra>"
             )
             fig_cat_rev.update_layout(
@@ -389,9 +405,9 @@ with tab3:
                 hole=0.55,
                 color='Segment',
                 color_discrete_map={
-                    'Repeat Customer (2-4 Orders)': '#2563EB',
-                    'One-Time Customer (1 Order)': '#94A3B8',
-                    'VIP Customer (5+ Orders)': '#059669'
+                    'Repeat Customer (2-4 Orders)': '#334155',
+                    'One-Time Customer (1 Order)': '#CBD5E1',
+                    'VIP Customer (5+ Orders)': '#0F172A'
                 }
             )
             fig_pie.update_traces(
