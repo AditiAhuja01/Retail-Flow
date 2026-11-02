@@ -290,11 +290,20 @@ with tab1:
             fig_monthly.update_layout(
                 paper_bgcolor="#FFFFFF",
                 plot_bgcolor="#FFFFFF",
-                font=dict(color="#1E293B", family="sans-serif"),
+                font=dict(color="#0F172A", family="sans-serif", size=12),
                 height=350,
-                margin=dict(l=10, r=10, t=10, b=10),
-                xaxis=dict(showgrid=False),
-                yaxis=dict(showgrid=True, gridcolor='#F1F5F9')
+                margin=dict(l=20, r=20, t=20, b=20),
+                xaxis=dict(
+                    showgrid=False,
+                    tickfont=dict(color="#0F172A", size=12, family="sans-serif"),
+                    title=dict(text="Transaction Month", font=dict(color="#0F172A", size=13))
+                ),
+                yaxis=dict(
+                    showgrid=True,
+                    gridcolor='#E2E8F0',
+                    tickfont=dict(color="#0F172A", size=12, family="sans-serif"),
+                    title=dict(text="Net Revenue (INR)", font=dict(color="#0F172A", size=13))
+                )
             )
             st.plotly_chart(fig_monthly, use_container_width=True)
 
@@ -343,11 +352,21 @@ with tab2:
             fig_cat_rev.update_layout(
                 paper_bgcolor="#FFFFFF",
                 plot_bgcolor="#FFFFFF",
-                font=dict(color="#1E293B", family="sans-serif"),
-                height=340,
-                margin=dict(l=10, r=10, t=10, b=10),
-                xaxis=dict(showgrid=False, tickangle=-10),
-                yaxis=dict(showgrid=True, gridcolor='#F1F5F9')
+                font=dict(color="#0F172A", family="sans-serif", size=12),
+                height=350,
+                margin=dict(l=20, r=20, t=20, b=25),
+                xaxis=dict(
+                    showgrid=False,
+                    tickangle=0,
+                    tickfont=dict(color="#0F172A", size=11, family="sans-serif"),
+                    title=dict(text="Product Category", font=dict(color="#0F172A", size=13))
+                ),
+                yaxis=dict(
+                    showgrid=True,
+                    gridcolor='#E2E8F0',
+                    tickfont=dict(color="#0F172A", size=11, family="sans-serif"),
+                    title=dict(text="Net Revenue (INR)", font=dict(color="#0F172A", size=13))
+                )
             )
             st.plotly_chart(fig_cat_rev, use_container_width=True)
 
@@ -361,17 +380,29 @@ with tab2:
                 labels={'category': 'Category', 'return_rate_percent': 'Return Rate (%)'}
             )
             fig_cat_ret.update_traces(
-                marker_color='#64748B',
+                marker_color='#475569',
+                texttemplate="%{x:.2f}%",
+                textposition="outside",
+                textfont=dict(color="#0F172A", size=11, family="sans-serif"),
                 hovertemplate="<b>%{y}</b><br>Return Rate: %{x:.2f}%<extra></extra>"
             )
             fig_cat_ret.update_layout(
                 paper_bgcolor="#FFFFFF",
                 plot_bgcolor="#FFFFFF",
-                font=dict(color="#1E293B", family="sans-serif"),
-                height=340,
-                margin=dict(l=10, r=10, t=10, b=10),
-                xaxis=dict(showgrid=True, gridcolor='#F1F5F9'),
-                yaxis=dict(showgrid=False)
+                font=dict(color="#0F172A", family="sans-serif", size=12),
+                height=350,
+                margin=dict(l=20, r=40, t=20, b=25),
+                xaxis=dict(
+                    showgrid=True,
+                    gridcolor='#E2E8F0',
+                    tickfont=dict(color="#0F172A", size=11, family="sans-serif"),
+                    title=dict(text="Return Rate (%)", font=dict(color="#0F172A", size=13))
+                ),
+                yaxis=dict(
+                    showgrid=False,
+                    tickfont=dict(color="#0F172A", size=11, family="sans-serif"),
+                    title=dict(text="", font=dict(color="#0F172A", size=13))
+                )
             )
             st.plotly_chart(fig_cat_ret, use_container_width=True)
 
@@ -423,12 +454,13 @@ with tab3:
             fig_pie.update_traces(
                 textposition='inside',
                 textinfo='percent+label',
+                textfont=dict(color="#FFFFFF", size=12, family="sans-serif"),
                 hovertemplate="<b>%{label}</b><br>Customers: %{value:,}<br>Share: %{percent}<extra></extra>"
             )
             fig_pie.update_layout(
                 paper_bgcolor="#FFFFFF",
                 plot_bgcolor="#FFFFFF",
-                font=dict(color="#1E293B", family="sans-serif"),
+                font=dict(color="#0F172A", family="sans-serif", size=12),
                 height=360,
                 showlegend=False,
                 margin=dict(l=10, r=10, t=10, b=10)
