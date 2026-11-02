@@ -23,13 +23,14 @@ st.markdown("""
         .stApp {
             background-color: #F8FAFC;
         }
-        /* Fix top cut-off by adding proper padding below Streamlit header */
+        /* Hide the default empty Streamlit top header bar completely */
         header[data-testid="stHeader"] {
-            background-color: transparent !important;
+            display: none !important;
         }
+        /* Position RetailFlow right at the very top */
         .block-container {
-            padding-top: 4.5rem !important;
-            padding-bottom: 3rem;
+            padding-top: 1.2rem !important;
+            padding-bottom: 2.5rem;
             padding-left: 2.5rem;
             padding-right: 2.5rem;
             max-width: 96% !important;
