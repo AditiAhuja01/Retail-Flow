@@ -193,7 +193,6 @@ st.markdown("""
         </div>
         <div>
             <div style="font-size: 1.85rem; font-weight: 700; color: #0F172A; line-height: 1.1; letter-spacing: -0.5px;">RetailFlow</div>
-            <div style="font-size: 0.85rem; color: #64748B; margin-top: 3px;">Automated E-Commerce Data Pipeline & Dimensional Warehouse</div>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -201,9 +200,8 @@ st.markdown("""
 # Status Pills
 st.markdown(f"""
     <div style="margin-bottom: 18px;">
-        <span class="status-pill"><b>Pipeline Status:</b> Active (SQLite Warehouse)</span>
         <span class="status-pill"><b>Data Quality:</b> 401,564 Clean | 135,077 Quarantined (24.9%)</span>
-        <span class="status-pill"><b>Live Currency API:</b> 1 GBP = Rs. {forex_rate:.2f}</span>
+        <span class="status-pill"><b>Currency Conversion:</b> 1 GBP = Rs. {forex_rate:.2f}</span>
     </div>
 """, unsafe_allow_html=True)
 
