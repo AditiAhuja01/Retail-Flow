@@ -223,9 +223,9 @@ k1, k2, k3, k4 = st.columns(4)
 with k1:
     st.markdown(f"""
         <div class="kpi-card">
-            <div class="kpi-label">Total Orders</div>
+            <div class="kpi-label">Completed Orders</div>
             <div class="kpi-value">{total_orders:,}</div>
-            <div class="kpi-sub">Completed invoices</div>
+            <div class="kpi-sub">Across 401,564 purchased items</div>
         </div>
     """, unsafe_allow_html=True)
 
