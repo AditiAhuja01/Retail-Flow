@@ -12,14 +12,15 @@ An automated data platform and dimensional warehouse that processes 540,000+ tra
 ## Dashboard Preview
 
 ### Revenue Trends
-![Revenue Trends](revenue-trends.png)
+![Revenue Trends](docs/revenue-trends.png)
 
 ### Product Returns
-![Product Returns](product-returns.png)
+![Product Returns](docs/product-returns.png)
 
 ### Customer Segments
-![Customer Segments](customer-segments.png)
+![Customer Segments](docs/customer-segments.png)
 
+---
 ---
 
 ## 1. Business Problem & Impact (Product Context)
