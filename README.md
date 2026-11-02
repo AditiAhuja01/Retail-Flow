@@ -71,3 +71,10 @@ python src/run_analytics.py
 ```bash
 streamlit run app.py
 ```
+
+### 4. Containerized Execution (Docker)
+To spin up the entire pipeline and dashboard without local Python setup:
+```bash
+docker compose up
+```
+Open `http://localhost:8501` in your browser.

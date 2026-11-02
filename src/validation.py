@@ -12,7 +12,7 @@ quarantine_path = os.path.join(DATA_DIR, "quarantine_records.csv")
 def clean_data():
     print("Step 1: Reading raw dataset into memory...")
     if not os.path.exists(raw_data_path):
-        print(f"❌ Error: Raw data file not found at {raw_data_path}. Please run download_data.py first.")
+        print(f"[ERROR] Raw data file not found at {raw_data_path}. Please run download_data.py first.")
         return
 
     # Read CSV. We force InvoiceNo, StockCode, and CustomerID to be read as strings to keep formatting
@@ -61,7 +61,7 @@ def clean_data():
 
     # Save clean dataset
     df_clean.to_csv(clean_data_path, index=False)
-    print(f"✅ Data cleaning complete!")
+    print("[SUCCESS] Data cleaning complete!")
     print(f"Clean rows saved: {len(df_clean)} (Out of {initial_rows} original rows)")
 
 if __name__ == "__main__":

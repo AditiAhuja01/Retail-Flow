@@ -23,7 +23,7 @@ def load_exchange_rate():
 def build_star_schema():
     print("Step 2: Connecting to SQLite and building Star Schema...")
     if not os.path.exists(clean_data_path):
-        print(f"❌ Error: Clean data not found at {clean_data_path}. Please run validation.py first.")
+        print(f"[ERROR] Clean data not found at {clean_data_path}. Please run validation.py first.")
         return
 
     # 1. Load clean CSV
@@ -40,6 +40,9 @@ def build_star_schema():
     # Connect to SQLite (creates the database file if it doesn't exist)
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+    
+    # Enforce foreign key constraints in SQLite
+    cursor.execute("PRAGMA foreign_keys = ON;")
 
     # Drop existing tables to ensure a clean run every time
     cursor.execute("DROP TABLE IF EXISTS fact_sales;")
@@ -171,7 +174,7 @@ def build_star_schema():
     
     conn.commit()
     conn.close()
-    print("✅ Star Schema created and tables loaded successfully!")
+    print("[SUCCESS] Star Schema created and tables loaded successfully!")
 
 if __name__ == "__main__":
     build_star_schema()

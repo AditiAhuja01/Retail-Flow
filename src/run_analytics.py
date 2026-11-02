@@ -13,7 +13,7 @@ db_path = os.path.join(DATA_DIR, "retailflow_data_warehouse.db")
 def run_analytical_queries():
     print("Step 3: Connecting to Data Warehouse and running analytical queries...")
     if not os.path.exists(db_path):
-        print(f"❌ Error: Database not found at {db_path}. Please run db_pipeline.py first.")
+        print(f"[ERROR] Database not found at {db_path}. Please run db_pipeline.py first.")
         return
 
     conn = sqlite3.connect(db_path)

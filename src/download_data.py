@@ -21,9 +21,9 @@ try:
     urllib.request.install_opener(opener)
     
     urllib.request.urlretrieve(DATASET_URL, raw_data_path)
-    print(f"✅ Raw dataset downloaded successfully at: {raw_data_path}")
+    print(f"[SUCCESS] Raw dataset downloaded successfully at: {raw_data_path}")
 except Exception as e:
-    print(f"❌ Error downloading dataset: {e}")
+    print(f"[ERROR] Error downloading dataset: {e}")
 
 # 2. Integrate Live REST API (Currency Exchange Rates)
 # Since the retail dataset is a UK dataset with prices in GBP, we fetch live conversion rates
@@ -38,9 +38,9 @@ try:
         rates = data.get("rates", {})
         inr_rate = rates.get("INR")
         usd_rate = rates.get("USD")
-        print("✅ API Connection successful!")
+        print("[SUCCESS] API Connection successful!")
         print(f"Current Rates for 1 GBP:")
-        print(f" - Indian Rupee (INR): ₹{inr_rate:.2f}")
+        print(f" - Indian Rupee (INR): Rs.{inr_rate:.2f}")
         print(f" - US Dollar (USD): ${usd_rate:.2f}")
         
         # Save exchange rate metadata for downstream pipeline use
@@ -48,8 +48,8 @@ try:
         with open(meta_path, "w") as f:
             f.write(f"INR_RATE={inr_rate}\n")
             f.write(f"USD_RATE={usd_rate}\n")
-        print(f"✅ Saved exchange rates locally in: {meta_path}")
+        print(f"[SUCCESS] Saved exchange rates locally in: {meta_path}")
     else:
-        print(f"❌ Failed to fetch exchange rates: HTTP {response.status_code}")
+        print(f"[ERROR] Failed to fetch exchange rates: HTTP {response.status_code}")
 except Exception as e:
-    print(f"❌ API connection error: {e}")
+    print(f"[ERROR] API connection error: {e}")

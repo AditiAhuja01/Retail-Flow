@@ -1,0 +1,10 @@
+services:
+  retailflow-analytics:
+    build: .
+    container_name: retailflow_dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+    restart: unless-stopped
