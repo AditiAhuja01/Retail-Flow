@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 # -------------------------------------------------------------
-# Page Configuration (Full Screen Width)
+# Page Configuration
 # -------------------------------------------------------------
 st.set_page_config(
     page_title="RetailFlow | E-Commerce Data Pipeline",
@@ -15,22 +15,26 @@ st.set_page_config(
 )
 
 # -------------------------------------------------------------
-# Simple Minimalist White & Grey Theme Styling
+# Minimalist White & Grey Theme Styling
 # -------------------------------------------------------------
 st.markdown("""
     <style>
-        /* Base page background: clean soft grey/white */
+        /* Base page background */
         .stApp {
             background-color: #F8FAFC;
         }
+        /* Fix top cut-off by adding proper padding below Streamlit header */
+        header[data-testid="stHeader"] {
+            background-color: transparent !important;
+        }
         .block-container {
-            padding-top: 1.5rem;
-            padding-bottom: 2.5rem;
+            padding-top: 4.5rem !important;
+            padding-bottom: 3rem;
             padding-left: 2.5rem;
             padding-right: 2.5rem;
             max-width: 96% !important;
         }
-        /* Top Status Pills (Minimal grey border) */
+        /* Top Status Pills */
         .status-pill {
             display: inline-block;
             padding: 5px 12px;
@@ -44,7 +48,7 @@ st.markdown("""
             margin-bottom: 8px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
         }
-        /* Minimalist White Metric Cards */
+        /* Minimalist Metric Cards */
         .kpi-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
@@ -80,37 +84,43 @@ st.markdown("""
             color: #0F172A;
             font-weight: 600;
         }
-        /* Chart container card */
-        .chart-box {
-            background-color: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-            margin-bottom: 12px;
-        }
+        /* Chart Section Titles */
         .chart-title {
             font-size: 0.92rem;
             font-weight: 600;
             color: #1E293B;
             margin-bottom: 10px;
         }
-        /* Simple observation box in clean grey */
-        .simple-box {
+        /* Clean Professional Summary Box (Zero Emojis) */
+        .summary-box {
             background-color: #FFFFFF;
-            border-left: 4px solid #334155;
+            border-left: 3px solid #334155;
             border-radius: 0 6px 6px 0;
-            padding: 14px 18px;
-            margin-top: 16px;
-            font-size: 0.9rem;
-            color: #334155;
-            line-height: 1.6;
+            padding: 16px 20px;
+            margin-top: 18px;
             border-top: 1px solid #E2E8F0;
             border-right: 1px solid #E2E8F0;
             border-bottom: 1px solid #E2E8F0;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
         }
-        /* Clean minimalist tabs */
+        .summary-heading {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #0F172A;
+            margin-bottom: 4px;
+        }
+        .summary-text {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .summary-text:last-child {
+            margin-bottom: 0px;
+        }
+        /* Clean Minimalist Tabs */
         button[data-baseweb="tab"] {
             font-size: 0.95rem;
             font-weight: 500;
@@ -172,39 +182,37 @@ df_rfm = load_report("rfm_segmentation.csv")
 forex_rate = get_forex_rate()
 
 # -------------------------------------------------------------
-# Classy Header with Logo & Title
+# Classy Header with Logo & Title (Proper Spacing)
 # -------------------------------------------------------------
 st.markdown("""
-    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
-        <div style="background: linear-gradient(135deg, #1E293B, #334155); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
+        <div style="background: #1E293B; width: 42px; height: 42px; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
             </svg>
         </div>
         <div>
             <div style="font-size: 1.85rem; font-weight: 700; color: #0F172A; line-height: 1.1; letter-spacing: -0.5px;">RetailFlow</div>
-            <div style="font-size: 0.86rem; color: #64748B; margin-top: 3px;">Automated E-Commerce Data Pipeline & Dimensional Warehouse</div>
+            <div style="font-size: 0.85rem; color: #64748B; margin-top: 3px;">Automated E-Commerce Data Pipeline & Dimensional Warehouse</div>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# Status Pills (Minimalist White & Grey)
+# Status Pills
 st.markdown(f"""
-    <div>
+    <div style="margin-bottom: 18px;">
         <span class="status-pill"><b>Pipeline Status:</b> Active (SQLite Warehouse)</span>
         <span class="status-pill"><b>Data Quality:</b> 401,564 Clean | 135,077 Quarantined (24.9%)</span>
         <span class="status-pill"><b>Live Currency API:</b> 1 GBP = Rs. {forex_rate:.2f}</span>
     </div>
 """, unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
-
 if df_summary is None:
     st.error("Reports directory is empty. Please run 'python src/run_analytics.py' first.")
     st.stop()
 
 # -------------------------------------------------------------
-# Top 4 KPI Metric Cards (White & Grey Minimalist)
+# Top 4 KPI Metric Cards
 # -------------------------------------------------------------
 total_orders = int(df_summary.loc[0, 'total_orders'])
 gross_sales = float(df_summary.loc[0, 'gross_sales_inr'])
@@ -307,9 +315,11 @@ with tab1:
             )
 
         st.markdown("""
-            <div class="simple-box">
-                <b>📌 What this means:</b> Sales grow steadily throughout the year, and <b>November was the biggest month</b> because of holiday shopping.<br>
-                <b>💡 What to do:</b> Order extra inventory 2 months before October so products do not run out of stock during the festival rush.
+            <div class="summary-box">
+                <div class="summary-heading">Key Finding</div>
+                <div class="summary-text">Sales increased steadily month-over-month, reaching an annual peak in November due to seasonal holiday demand.</div>
+                <div class="summary-heading">Operational Action</div>
+                <div class="summary-text">Schedule inventory restocking 60 days prior to Q4 to prevent out-of-stock events during high-volume periods.</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -380,9 +390,11 @@ with tab2:
         )
 
         st.markdown("""
-            <div class="simple-box">
-                <b>📌 What this means:</b> <i>Kitchen & Dining</i> (3.1%) and <i>Lighting & Decor</i> (2.9%) have the highest return rates.<br>
-                <b>💡 What to do:</b> Check product quality and packaging with suppliers for kitchen and light items to prevent damage and reduce returns.
+            <div class="summary-box">
+                <div class="summary-heading">Key Finding</div>
+                <div class="summary-text">Kitchen & Dining (3.1%) and Lighting & Decor (2.9%) exhibit the highest return rates across the product portfolio.</div>
+                <div class="summary-heading">Operational Action</div>
+                <div class="summary-text">Conduct supplier quality reviews and improve packaging for fragile SKUs to reduce return volumes and reverse freight costs.</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -440,9 +452,10 @@ with tab3:
             )
 
     st.markdown("""
-        <div class="simple-box">
-            <b>📌 What this means:</b> 
-            1 out of 4 customers (25.5%) is a VIP who orders frequently. But <b>34% of people only buy once</b> and never return.<br>
-            <b>💡 What to do:</b> Send a 10% discount coupon to one-time buyers within 30 days of their first order to turn them into repeat buyers.
+        <div class="summary-box">
+            <div class="summary-heading">Key Finding</div>
+            <div class="summary-text">Repeat and VIP customers make up 65% of accounts, but 34% of customers have made only a single purchase.</div>
+            <div class="summary-heading">Operational Action</div>
+            <div class="summary-text">Send automated follow-up communications within 30 days of the first transaction to convert one-time buyers into repeat customers.</div>
         </div>
     """, unsafe_allow_html=True)
