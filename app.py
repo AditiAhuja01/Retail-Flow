@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 # -------------------------------------------------------------
-# Page Configuration
+# Page Configuration (Full Screen Width)
 # -------------------------------------------------------------
 st.set_page_config(
     page_title="RetailFlow | Executive Analytics",
@@ -15,26 +15,39 @@ st.set_page_config(
 )
 
 # -------------------------------------------------------------
-# Corporate Light Theme Styling
+# Clean Light Theme Styling
 # -------------------------------------------------------------
 st.markdown("""
     <style>
-        /* Base page background */
-        .stApp {
-            background-color: #FAFAFA;
-        }
+        /* Make content use full screen comfortably */
         .block-container {
-            padding-top: 2rem;
-            padding-bottom: 3rem;
-            max-width: 1200px;
+            padding-top: 1.5rem;
+            padding-bottom: 2.5rem;
+            padding-left: 2.5rem;
+            padding-right: 2.5rem;
+            max-width: 96% !important;
         }
-        /* Metric cards */
+        /* Top Status Pills */
+        .status-pill {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            background-color: #F1F5F9;
+            color: #334155;
+            border: 1px solid #CBD5E1;
+            margin-right: 10px;
+            margin-bottom: 8px;
+        }
+        /* Top KPI Metric Cards */
         .kpi-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 8px;
             padding: 16px 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            min-height: 110px;
         }
         .kpi-label {
             font-size: 0.78rem;
@@ -45,15 +58,15 @@ st.markdown("""
             margin-bottom: 4px;
         }
         .kpi-value {
-            font-size: 1.8rem;
+            font-size: 1.85rem;
             font-weight: 700;
             color: #0F172A;
             line-height: 1.2;
         }
         .kpi-sub {
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             color: #64748B;
-            margin-top: 6px;
+            margin-top: 4px;
         }
         .kpi-loss {
             color: #DC2626;
@@ -63,43 +76,46 @@ st.markdown("""
             color: #059669;
             font-weight: 600;
         }
-        /* Status badge */
-        .status-pill {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            background-color: #F1F5F9;
-            color: #334155;
-            border: 1px solid #CBD5E1;
-            margin-right: 8px;
+        /* Chart container card */
+        .chart-box {
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            margin-bottom: 12px;
         }
-        /* Executive observation box */
-        .insight-box {
+        .chart-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1E293B;
+            margin-bottom: 12px;
+        }
+        /* Simple observation box */
+        .simple-box {
             background-color: #F8FAFC;
             border-left: 4px solid #2563EB;
             border-radius: 0 6px 6px 0;
-            padding: 14px 18px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            font-size: 0.88rem;
+            padding: 16px 20px;
+            margin-top: 16px;
+            font-size: 0.92rem;
             color: #334155;
-            line-height: 1.5;
+            line-height: 1.6;
             border-top: 1px solid #E2E8F0;
             border-right: 1px solid #E2E8F0;
             border-bottom: 1px solid #E2E8F0;
         }
-        /* Clean tabs */
+        /* Tabs styling */
         button[data-baseweb="tab"] {
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 500;
             color: #475569;
-            padding: 0.6rem 1.2rem;
+            padding: 0.6rem 1.5rem;
         }
         button[data-baseweb="tab"][aria-selected="true"] {
             color: #2563EB !important;
             font-weight: 600;
+            border-bottom-color: #2563EB !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -151,19 +167,17 @@ df_rfm = load_report("rfm_segmentation.csv")
 forex_rate = get_forex_rate()
 
 # -------------------------------------------------------------
-# Header & Data Pipeline Health
+# Header
 # -------------------------------------------------------------
 st.title("RetailFlow Analytics Platform")
-st.markdown(
-    "Batch ETL & Star Schema Data Warehouse processing 540,000+ international transaction records."
-)
+st.caption("End-to-end data pipeline processing 540,000+ retail sales records into a Star Schema data warehouse.")
 
-# Status indicators
+# Status Bar
 st.markdown(f"""
     <div>
         <span class="status-pill"><b>Pipeline Status:</b> Active (SQLite Warehouse)</span>
-        <span class="status-pill"><b>Ingestion Quality:</b> 401,564 Clean | 135,077 Quarantined (24.9%)</span>
-        <span class="status-pill"><b>Live Forex API:</b> 1 GBP = Rs. {forex_rate:.2f}</span>
+        <span class="status-pill"><b>Data Quality:</b> 401,564 Clean | 135,077 Quarantined (24.9%)</span>
+        <span class="status-pill"><b>Live Currency Rate:</b> 1 GBP = Rs. {forex_rate:.2f}</span>
     </div>
 """, unsafe_allow_html=True)
 
@@ -174,7 +188,7 @@ if df_summary is None:
     st.stop()
 
 # -------------------------------------------------------------
-# Top KPI Metric Cards
+# Top KPI Metric Cards (Aligned)
 # -------------------------------------------------------------
 total_orders = int(df_summary.loc[0, 'total_orders'])
 gross_sales = float(df_summary.loc[0, 'gross_sales_inr'])
@@ -182,41 +196,41 @@ refund_losses = float(df_summary.loc[0, 'refund_losses_inr'])
 net_revenue = float(df_summary.loc[0, 'net_revenue_inr'])
 refund_rate = (refund_losses / gross_sales) * 100 if gross_sales > 0 else 0
 
-c1, c2, c3, c4 = st.columns(4)
+k1, k2, k3, k4 = st.columns(4)
 
-with c1:
+with k1:
     st.markdown(f"""
         <div class="kpi-card">
-            <div class="kpi-label">Total Invoices</div>
+            <div class="kpi-label">Total Orders</div>
             <div class="kpi-value">{total_orders:,}</div>
-            <div class="kpi-sub">Completed transactions</div>
+            <div class="kpi-sub">Distinct invoices</div>
         </div>
     """, unsafe_allow_html=True)
 
-with c2:
+with k2:
     st.markdown(f"""
         <div class="kpi-card">
             <div class="kpi-label">Gross Sales</div>
             <div class="kpi-value">{format_inr(gross_sales)}</div>
-            <div class="kpi-sub">Pre-cancellation volume</div>
+            <div class="kpi-sub">Total sales before returns</div>
         </div>
     """, unsafe_allow_html=True)
 
-with c3:
+with k3:
     st.markdown(f"""
         <div class="kpi-card">
-            <div class="kpi-label">Return Deductions</div>
+            <div class="kpi-label">Refund Losses (Returns)</div>
             <div class="kpi-value">{format_inr(-refund_losses)}</div>
-            <div class="kpi-sub"><span class="kpi-loss">{refund_rate:.2f}%</span> of gross volume</div>
+            <div class="kpi-sub"><span class="kpi-loss">{refund_rate:.2f}%</span> of total sales refunded</div>
         </div>
     """, unsafe_allow_html=True)
 
-with c4:
+with k4:
     st.markdown(f"""
         <div class="kpi-card">
-            <div class="kpi-label">Net Realized Revenue</div>
+            <div class="kpi-label">Net Sales Revenue</div>
             <div class="kpi-value">{format_inr(net_revenue)}</div>
-            <div class="kpi-sub"><span class="kpi-positive">Net after returns</span></div>
+            <div class="kpi-sub"><span class="kpi-positive">Actual money made</span></div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -232,144 +246,138 @@ tab1, tab2, tab3 = st.tabs([
 ])
 
 # -------------------------------------------------------------
-# Tab 1: Revenue Trends & Monthly Performance
+# Tab 1: Revenue Trends
 # -------------------------------------------------------------
 with tab1:
-    st.subheader("Monthly Revenue Trajectory")
-    st.caption("Month-by-month realized net revenue and order volumes.")
-
     if df_monthly is not None:
         col_m1, col_m2 = st.columns([3, 2])
         
         with col_m1:
-            # Clean Plotly Line/Area Chart
+            st.markdown('<div class="chart-title">Monthly Net Revenue (INR)</div>', unsafe_allow_html=True)
             fig_monthly = px.area(
                 df_monthly,
                 x='year_month',
                 y='net_revenue_inr',
-                labels={'year_month': 'Month', 'net_revenue_inr': 'Net Revenue (INR)'},
-                title="Monthly Net Revenue (INR)"
+                labels={'year_month': 'Month', 'net_revenue_inr': 'Net Revenue (INR)'}
             )
             fig_monthly.update_traces(
                 line_color='#2563EB',
-                fillcolor='rgba(37, 99, 235, 0.1)',
+                fillcolor='rgba(37, 99, 235, 0.12)',
                 hovertemplate="<b>%{x}</b><br>Net Revenue: Rs. %{y:,.2f}<extra></extra>"
             )
             fig_monthly.update_layout(
-                template="plotly_white",
-                height=340,
-                margin=dict(l=20, r=20, t=40, b=20),
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#FFFFFF",
+                font=dict(color="#1E293B", family="sans-serif"),
+                height=350,
+                margin=dict(l=10, r=10, t=10, b=10),
                 xaxis=dict(showgrid=False),
                 yaxis=dict(showgrid=True, gridcolor='#F1F5F9')
             )
             st.plotly_chart(fig_monthly, use_container_width=True)
 
         with col_m2:
-            st.markdown("**Monthly Performance Breakdown**")
+            st.markdown('<div class="chart-title">Month-by-Month Growth Table</div>', unsafe_allow_html=True)
             disp_m = df_monthly.copy()
-            disp_m.columns = ['Month', 'Orders', 'Net Revenue (INR)', 'MoM Growth (%)']
+            disp_m.columns = ['Month', 'Orders', 'Net Revenue', 'Growth (%)']
             st.dataframe(
                 disp_m.style.format({
-                    'Net Revenue (INR)': format_inr,
+                    'Net Revenue': format_inr,
                     'Orders': '{:,}',
-                    'MoM Growth (%)': '{:+.2f}%'
+                    'Growth (%)': '{:+.2f}%'
                 }, na_rep="--"),
                 use_container_width=True,
-                height=340
+                height=350
             )
 
         st.markdown("""
-            <div class="insight-box">
-                <b>Executive Observation:</b> Realized revenue demonstrates steady month-over-month expansion, 
-                culminating in peak sales in Q4 (November). This seasonal surge accounts for over 35% of annual net revenue, 
-                confirming the need for automated inventory staging ahead of peak promotional periods.
+            <div class="simple-box">
+                <b>📌 What this means:</b> Sales grow steadily throughout the year, and <b>November was the biggest month</b> because of holiday shopping.<br>
+                <b>💡 What to do:</b> Order extra inventory 2 months before October so products do not run out of stock during the festival rush.
             </div>
         """, unsafe_allow_html=True)
 
 # -------------------------------------------------------------
-# Tab 2: Product Returns & Category Performance
+# Tab 2: Product Returns
 # -------------------------------------------------------------
 with tab2:
-    st.subheader("Category Performance & Return Deductions")
-    st.caption("Evaluation of product return rates to identify reverse logistics impact.")
-
     if df_category is not None:
         col_c1, col_c2 = st.columns(2)
 
         with col_c1:
+            st.markdown('<div class="chart-title">Sales by Product Category (INR)</div>', unsafe_allow_html=True)
             fig_cat_rev = px.bar(
                 df_category,
                 x='category',
                 y='net_revenue_inr',
-                labels={'category': 'Category', 'net_revenue_inr': 'Net Revenue (INR)'},
-                title="Net Revenue by Product Category"
+                labels={'category': 'Category', 'net_revenue_inr': 'Net Revenue'}
             )
             fig_cat_rev.update_traces(
                 marker_color='#2563EB',
-                hovertemplate="<b>%{x}</b><br>Net Revenue: Rs. %{y:,.2f}<extra></extra>"
+                hovertemplate="<b>%{x}</b><br>Sales: Rs. %{y:,.2f}<extra></extra>"
             )
             fig_cat_rev.update_layout(
-                template="plotly_white",
-                height=320,
-                margin=dict(l=20, r=20, t=40, b=20),
-                xaxis=dict(showgrid=False, tickangle=-15),
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#FFFFFF",
+                font=dict(color="#1E293B", family="sans-serif"),
+                height=340,
+                margin=dict(l=10, r=10, t=10, b=10),
+                xaxis=dict(showgrid=False, tickangle=-10),
                 yaxis=dict(showgrid=True, gridcolor='#F1F5F9')
             )
             st.plotly_chart(fig_cat_rev, use_container_width=True)
 
         with col_c2:
+            st.markdown('<div class="chart-title">Return Rate (%) by Category</div>', unsafe_allow_html=True)
             fig_cat_ret = px.bar(
                 df_category.sort_values('return_rate_percent', ascending=True),
                 x='return_rate_percent',
                 y='category',
                 orientation='h',
-                labels={'category': 'Category', 'return_rate_percent': 'Return Rate (%)'},
-                title="Product Return Rate (%) by Category"
+                labels={'category': 'Category', 'return_rate_percent': 'Return Rate (%)'}
             )
             fig_cat_ret.update_traces(
                 marker_color='#64748B',
                 hovertemplate="<b>%{y}</b><br>Return Rate: %{x:.2f}%<extra></extra>"
             )
             fig_cat_ret.update_layout(
-                template="plotly_white",
-                height=320,
-                margin=dict(l=20, r=20, t=40, b=20),
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#FFFFFF",
+                font=dict(color="#1E293B", family="sans-serif"),
+                height=340,
+                margin=dict(l=10, r=10, t=10, b=10),
                 xaxis=dict(showgrid=True, gridcolor='#F1F5F9'),
                 yaxis=dict(showgrid=False)
             )
             st.plotly_chart(fig_cat_ret, use_container_width=True)
 
-        st.markdown("**Category Detail Metrics**")
+        st.markdown('<div class="chart-title">Detailed Category Numbers</div>', unsafe_allow_html=True)
         disp_cat = df_category.copy()
-        disp_cat.columns = ['Product Category', 'Transactions', 'Net Revenue', 'Return Rate (%)']
+        disp_cat.columns = ['Category', 'Orders Count', 'Net Revenue', 'Return Rate (%)']
         st.dataframe(
             disp_cat.style.format({
                 'Net Revenue': format_inr,
-                'Transactions': '{:,}',
+                'Orders Count': '{:,}',
                 'Return Rate (%)': '{:.2f}%'
             }),
             use_container_width=True
         )
 
         st.markdown("""
-            <div class="insight-box">
-                <b>Executive Observation:</b> <i>Kitchen & Dining</i> (3.12%) and <i>Lighting & Decor</i> (2.88%) 
-                exhibit the highest return rates across the product portfolio. 
-                <b>Operational Recommendation:</b> Operations and vendor management can prioritize quality audits on 
-                high-return SKUs in these two categories to minimize reverse logistics freight costs.
+            <div class="simple-box">
+                <b>📌 What this means:</b> <i>Kitchen & Dining</i> (3.1%) and <i>Lighting & Decor</i> (2.9%) have the highest return rates.<br>
+                <b>💡 What to do:</b> Check product quality and packaging with suppliers for kitchen and light items to prevent damage and reduce returns.
             </div>
         """, unsafe_allow_html=True)
 
 # -------------------------------------------------------------
-# Tab 3: Customer Retention & Segmentation
+# Tab 3: Customer Segments
 # -------------------------------------------------------------
 with tab3:
-    st.subheader("Customer Frequency Segmentation & Lifetime Value")
-    st.caption("Distribution of purchasing accounts and high-value customer concentration.")
-
     col_s1, col_s2 = st.columns(2)
 
     with col_s1:
+        st.markdown('<div class="chart-title">Customer Order Frequency (1 Order vs Multiple)</div>', unsafe_allow_html=True)
         if df_rfm is not None:
             segment_counts = df_rfm['customer_segment'].value_counts().reset_index()
             segment_counts.columns = ['Segment', 'Count']
@@ -379,7 +387,6 @@ with tab3:
                 names='Segment',
                 values='Count',
                 hole=0.55,
-                title="Customer Order Frequency Distribution",
                 color='Segment',
                 color_discrete_map={
                     'Repeat Customer (2-4 Orders)': '#2563EB',
@@ -393,32 +400,33 @@ with tab3:
                 hovertemplate="<b>%{label}</b><br>Customers: %{value:,}<br>Share: %{percent}<extra></extra>"
             )
             fig_pie.update_layout(
-                template="plotly_white",
-                height=320,
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#FFFFFF",
+                font=dict(color="#1E293B", family="sans-serif"),
+                height=360,
                 showlegend=False,
-                margin=dict(l=20, r=20, t=40, b=20)
+                margin=dict(l=10, r=10, t=10, b=10)
             )
             st.plotly_chart(fig_pie, use_container_width=True)
 
     with col_s2:
-        st.markdown("**Top 10 Accounts by Lifetime Value (LTV)**")
+        st.markdown('<div class="chart-title">Top 10 High-Spending Customers (LTV)</div>', unsafe_allow_html=True)
         if df_ltv is not None:
             disp_ltv = df_ltv.copy()
-            disp_ltv.columns = ['Customer ID', 'Country', 'Orders', 'Realized LTV']
+            disp_ltv.columns = ['Customer ID', 'Country', 'Orders', 'Total Spend']
             st.dataframe(
                 disp_ltv.style.format({
-                    'Realized LTV': format_inr,
+                    'Total Spend': format_inr,
                     'Orders': '{:,}'
                 }),
                 use_container_width=True,
-                height=320
+                height=360
             )
 
     st.markdown("""
-        <div class="insight-box">
-            <b>Executive Observation:</b> High-frequency accounts (VIP buyers with 5+ orders) represent 25.5% of the customer base 
-            yet account for the majority of recurring transaction flow. Meanwhile, 34.2% of purchasers remain one-time buyers.
-            <b>Commercial Recommendation:</b> The retention marketing team can deploy automated re-engagement workflows 
-            within 30 days of the first purchase to convert single-order buyers into repeat customers.
+        <div class="simple-box">
+            <b>📌 What this means:</b> 
+            1 out of 4 customers (25.5%) is a VIP who orders frequently. But <b>34% of people only buy once</b> and never return.<br>
+            <b>💡 What to do:</b> Send a 10% discount coupon to one-time buyers within 30 days of their first order to turn them into repeat buyers.
         </div>
     """, unsafe_allow_html=True)
