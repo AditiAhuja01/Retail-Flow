@@ -1,20 +1,25 @@
-# RetailFlow: E-Commerce ETL Pipeline & Dimensional Data Warehouse
+# RetailFlow
 
-An end-to-end batch data engineering pipeline and relational data warehouse that ingests over 540,000 raw international transaction records, normalizes multi-currency sales via a live REST API, quarantines corrupt records, and structures clean data into a Kimball Star Schema for executive financial analytics.
+An automated batch ETL pipeline and dimensional data warehouse that processes 540,000+ transaction records, normalizes international sales to INR via live Forex REST API, and delivers net revenue and customer retention analytics on an executive dashboard.
+
+[Live Dashboard](https://retail-flow.streamlit.app) | [GitHub Repository](https://github.com/AditiAhuja01/retail-flow)
 
 ---
 
-## 1. Executive Summary & Business Problem
+## Dashboard Preview
 
-Retail platforms and international airlines face two primary data challenges:
-1. **Return Revenue Blindness:** In transactional databases, cancelled and returned orders are recorded alongside positive sales. Evaluating performance based only on gross sales hides true realized profit and conceals margin erosion caused by return logistics.
-2. **Ingestion Data Quality:** Real-world transactional datasets contain incomplete records (missing customer identifiers, invalid zero prices). Loading dirty data corrupts reporting, while silently deleting records eliminates the financial audit trail.
+<!-- Replace with your dashboard screenshot path, e.g. docs/dashboard_preview.png -->
+![RetailFlow Dashboard Preview](docs/dashboard_preview.png)
 
-**The RetailFlow Solution:**
-* Automatically ingests international sales data and integrates a live Forex REST API (`open.er-api.com`) to normalize foreign currency transactions into base reporting currency (INR).
-* Implements a defensive data quality layer that safely isolates 135,077 corrupt records into an auditable quarantine file while loading 401,564 verified records into the warehouse.
-* Models data into an indexed Kimball Star Schema (1 Fact, 3 Dimensions) in SQLite, enabling sub-second query response times.
-* Computes net realized revenue, category return percentages, and customer retention tiers surfaced through an executive Streamlit dashboard containerized with Docker.
+---
+
+## 1. Business Problem & Impact (Product Context)
+
+Retail platforms face significant profit leakage and reporting inaccuracy due to three factors:
+
+* **Return Revenue Blindness:** Reporting gross sales without separating cancellations overstates realized revenue. In this dataset, returns account for Rs. 7.85 Crores (6.85% of gross sales).
+* **Defective Product Categories:** High return rates in specific merchandise categories (Kitchen & Dining at 3.1%, Lighting at 2.9%) indicate supplier or packaging defects requiring operational intervention.
+* **Customer Retention Gap:** 34% of customer accounts make only a single purchase, representing lost lifetime value without targeted re-engagement campaigns.
 
 ---
 
@@ -22,180 +27,81 @@ Retail platforms and international airlines face two primary data challenges:
 
 ```mermaid
 flowchart LR
-    subgraph S1 ["1. Data Ingestion"]
-        A1["Raw Sales Logs<br>541,909 records"]
-        A2["Forex REST API<br>Live GBP to INR"]
-    end
-
-    subgraph S2 ["2. Data Validation & DLQ"]
-        B1["validation.py<br>Integrity Rules"]
-        B2["quarantine_records.csv<br>135,077 Non-Compliant Rows"]
-        B3["clean_online_retail.csv<br>401,564 Verified Rows"]
-    end
-
-    subgraph S3 ["3. Star Schema Warehouse"]
-        C1[("retailflow_data_warehouse.db<br>SQLite Database")]
-        C2["Dimensions:<br>dim_customers<br>dim_products<br>dim_dates"]
-        C3["Fact Table:<br>fact_sales<br>(Indexed Foreign Keys)"]
-    end
-
-    subgraph S4 ["4. Analytics & Executive UI"]
-        D1["run_analytics.py<br>Relational SQL"]
-        D2["reports/ Directory<br>Summary Aggregates"]
-        D3["Streamlit Dashboard<br>app.py & Docker"]
-    end
-
-    A1 --> B1
-    A2 --> B1
-    B1 -->|Failed Validation| B2
-    B1 -->|Passed Validation| B3
-    B3 --> C1
-    C1 --- C2
-    C1 --- C3
-    C3 --> D1
-    D1 --> D2
-    D2 --> D3
+    A["Raw Sales Logs"] --> C["validation.py<br>Data Cleaning"]
+    B["Forex REST API"] --> C
+    C -->|Clean Data| D[("retailflow.db<br>Star Schema")]
+    C -->|Corrupt Rows| E["quarantine.csv<br>Audit Log"]
+    D --> F["run_analytics.py<br>SQL Engine"]
+    F --> G["Streamlit Dashboard<br>Executive UI"]
 ```
 
----
-
-## 3. Verified Project Metrics
-
-| Metric | Measured Value | Calculation & Source |
-| :--- | :--- | :--- |
-| **Total Ingested Rows** | **541,909 rows** | Raw transactional dataset extract |
-| **Duplicate Rows Removed** | **5,268 rows** | Exact row deduplication in Pandas |
-| **Quarantined Records** | **135,077 rows (24.9%)** | Rows with missing `CustomerID` or `UnitPrice <= 0` |
-| **Verified Clean Rows** | **401,564 rows** | Clean line-item facts stored in `fact_sales` |
-| **Total Completed Orders** | **22,186 orders** | `COUNT(DISTINCT invoice_no)` in `fact_sales` |
-| **Gross Sales Volume** | **Rs. 114.67 Cr** | Sum of positive purchase transactions |
-| **Return Deductions** | **-Rs. 7.85 Cr (6.85%)** | Total refunds from return invoices (`is_returned = 1`) |
-| **Net Realized Revenue** | **Rs. 106.82 Cr** | Realized net cash revenue after return deductions |
+### Pipeline Stages
+1. **Ingestion & Normalization (`download_data.py`):** Downloads raw transaction data and queries the `open.er-api.com` REST API for current exchange rates.
+2. **Validation & Quarantine (`validation.py`):** Deduplicates records and routes 135,077 non-compliant rows (missing Customer IDs, zero-value prices) into an auditable quarantine file.
+3. **Star Schema Modeling (`db_pipeline.py`):** Normalizes 401,564 clean line-items into indexed Fact and Dimension tables in SQLite with referential integrity enabled.
+4. **Analytics & Presentation (`run_analytics.py` & `app.py`):** Executes relational SQL queries to calculate net financial metrics and serves an interactive dashboard.
 
 ---
 
-## 4. Dimensional Data Warehouse Design (Star Schema)
+## 3. Data Warehouse Design (Kimball Star Schema)
 
-The warehouse normalizes flat transaction logs into a relational Kimball Star Schema with active foreign key referential integrity (`PRAGMA foreign_keys = ON;`) and B-Tree indexes:
+The warehouse structures transactional facts and dimensional context for low-latency analytical queries:
 
 * **`fact_sales` (Fact Table):**
-  * `sales_id` (INTEGER, Primary Key, Autoincrement)
-  * `invoice_no` (TEXT)
-  * `customer_id` (TEXT, Foreign Key $\rightarrow$ `dim_customers.customer_id`)
-  * `product_code` (TEXT, Foreign Key $\rightarrow$ `dim_products.product_code`)
-  * `date_key` (INTEGER, Foreign Key $\rightarrow$ `dim_dates.date_key`)
-  * `quantity` (INTEGER)
-  * `unit_price` (REAL)
-  * `amount_gbp` (REAL)
-  * `amount_inr` (REAL, converted using live API rate)
-  * `is_returned` (INTEGER: `1` for return, `0` for sale)
+  * Primary Key: `sales_id`
+  * Foreign Keys: `customer_id`, `product_code`, `date_key`
+  * Metrics: `quantity`, `unit_price`, `amount_gbp`, `amount_inr`, `is_returned`
+* **`dim_customers`:** `customer_id` (PK), `country`
+* **`dim_products`:** `product_code` (PK), `description`, `category`
+* **`dim_dates`:** `date_key` (PK, YYYYMMDD), `full_date`, `year`, `month`, `quarter`, `day_of_week`
 
-* **`dim_customers` (Dimension Table):**
-  * `customer_id` (TEXT, Primary Key)
-  * `country` (TEXT)
-
-* **`dim_products` (Dimension Table):**
-  * `product_code` (TEXT, Primary Key)
-  * `description` (TEXT)
-  * `category` (TEXT, classified into 5 retail categories)
-
-* **`dim_dates` (Dimension Table):**
-  * `date_key` (INTEGER, Primary Key: `YYYYMMDD`)
-  * `full_date` (TEXT: `YYYY-MM-DD`)
-  * `year`, `month`, `quarter`, `day`, `day_of_week`
+B-Tree indexes are created on `fact_sales(customer_id)`, `fact_sales(product_code)`, and `fact_sales(date_key)` to accelerate join performance.
 
 ---
 
-## 5. Key Findings & Operational Actions
+## 4. Key Metrics Summary
 
-1. **Seasonal Demand Expansion (Revenue Trends):**
-   * *Finding:* Sales grow steadily over the year, peaking in November (Q4 accounts for over 35% of annual volume).
-   * *Action:* Plan inventory orders 60 days ahead of Q4 to avoid stock-outs during peak shopping periods.
-
-2. **Reverse Logistics Leakage (Product Returns):**
-   * *Finding:* Returns cost Rs. 7.85 Crores (6.85% of gross revenue), with *Kitchen & Dining* (3.1%) and *Lighting & Decor* (2.9%) experiencing the highest return rates.
-   * *Action:* Conduct supplier quality inspections and reinforce packaging for fragile SKUs in these categories to minimize return freight costs.
-
-3. **Customer Retention Concentration (Customer Segments):**
-   * *Finding:* Repeat and VIP buyers represent 65% of accounts, but 34% of customers only buy once.
-   * *Action:* Deploy automated follow-up offers within 30 days of the first purchase to convert single-order buyers into repeat customers.
+| Metric | Measured Value | Description |
+| :--- | :--- | :--- |
+| **Total Ingested Records** | 541,909 rows | Raw transaction extract |
+| **Quarantined Records** | 135,077 rows (24.9%) | Records with missing Customer ID or price <= 0 |
+| **Clean Warehouse Line-Items** | 401,564 rows | Verified records stored in `fact_sales` |
+| **Completed Orders** | 22,186 orders | Distinct invoices processed |
+| **Gross Sales Volume** | Rs. 114.67 Cr | Total sales before return deductions |
+| **Return Deductions** | -Rs. 7.85 Cr (6.85%) | Refunds resulting from customer cancellations |
+| **Net Realized Revenue** | Rs. 106.82 Cr | Actual cash revenue generated |
 
 ---
 
-## 6. Setup & Execution Guide
+## 5. Key Findings & Actions
 
-### Option A: Local Execution (Step-by-Step)
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/AditiAhuja01/retail-flow.git
-   cd retail-flow
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Run the pipeline stages:**
-   ```bash
-   # Step 1: Download raw data and fetch live exchange rates
-   python src/download_data.py
-
-   # Step 2: Clean data and quarantine corrupt rows
-   python src/validation.py
-
-   # Step 3: Build Star Schema database in SQLite
-   python src/db_pipeline.py
-
-   # Step 4: Run SQL analytical queries
-   python src/run_analytics.py
-   ```
-
-4. **Launch the dashboard:**
-   ```bash
-   streamlit run app.py
-   ```
+* **Revenue Seasonality:** Sales increase steadily throughout the year and peak in November (Q4 accounts for over 35% of annual revenue). Inventory staging should occur 60 days prior to Q4.
+* **Return Concentration:** Kitchen & Dining (3.1%) and Lighting & Decor (2.9%) exhibit the highest return rates. Operations should prioritize supplier quality audits on fragile SKUs in these categories.
+* **Customer Retention:** High-frequency buyers (5+ orders) represent 25.5% of accounts but drive the majority of revenue. Marketing should deploy 30-day post-purchase offers to convert single-order buyers into repeat customers.
 
 ---
 
-### Option B: Containerized Execution (Docker)
+## 6. How to Run
 
-To run the entire pipeline and dashboard in an isolated container without installing local dependencies:
+### Local Setup
+```bash
+# 1. Clone repository and install dependencies
+git clone https://github.com/AditiAhuja01/retail-flow.git
+cd retail-flow
+pip install -r requirements.txt
 
+# 2. Run data pipeline
+python src/download_data.py
+python src/validation.py
+python src/db_pipeline.py
+python src/run_analytics.py
+
+# 3. Launch dashboard
+streamlit run app.py
+```
+
+### Docker Execution
 ```bash
 docker compose up
 ```
-
-Access the dashboard at `http://localhost:8501`.
-
----
-
-## 7. Project Structure
-
-```
-├── .streamlit/
-│   └── config.toml             # Streamlit light-theme configuration
-├── data/
-│   ├── clean_online_retail.csv # Validated staging data (401k rows)
-│   ├── exchange_rates.txt      # Live Forex API metadata
-│   ├── quarantine_records.csv  # Quarantined corrupt rows (135k rows)
-│   ├── raw_online_retail.csv   # Raw transaction extract
-│   └── retailflow_data_warehouse.db # SQLite Star Schema warehouse
-├── reports/                    # Aggregated CSV outputs from SQL queries
-│   ├── category_performance.csv
-│   ├── financial_summary.csv
-│   ├── monthly_trends.csv
-│   ├── rfm_segmentation.csv
-│   └── top_10_customers_ltv.csv
-├── src/
-│   ├── download_data.py        # Ingestion & live Forex API client
-│   ├── validation.py           # Data cleaning & quarantine filter
-│   ├── db_pipeline.py          # Star Schema builder & index generator
-│   └── run_analytics.py        # Relational SQL analytics engine
-├── app.py                      # Executive Streamlit analytics platform
-├── Dockerfile                  # Lightweight Python 3.11 container definition
-├── docker-compose.yml          # Container service definition
-├── requirements.txt            # Python package dependencies
-└── README.md                   # Project documentation
-```
+Open `http://localhost:8501` in your browser.
