@@ -30,17 +30,24 @@ def clean_data():
     duplicate_count = initial_rows - len(df)
     print(f"Dropped {duplicate_count} duplicate rows.")
 
-    # 2. Separate Dirty Records (Missing Customer ID or Unit Price <= 0)
-    # These are invalid for client tracking, so we isolate them
-    is_dirty = df['CustomerID'].isnull() | (df['UnitPrice'] <= 0)
+    # 2. Separate Truly Corrupt Records (Invalid or non-positive Unit Price)
+    # Note: Missing CustomerID represents anonymous guest checkouts, not corrupted transactions.
+    unit_price_numeric = pd.to_numeric(df['UnitPrice'], errors='coerce')
+    is_invalid_price = unit_price_numeric.isnull() | (unit_price_numeric <= 0)
     
-    df_dirty = df[is_dirty].copy()
-    df_clean = df[~is_dirty].copy()
+    df_dirty = df[is_invalid_price].copy()
+    df_dirty['quarantine_reason'] = 'Invalid or non-positive unit price'
+    
+    df_clean = df[~is_invalid_price].copy()
+    
+    # Handle guest checkouts safely instead of discarding valid revenue
+    df_clean['CustomerID'] = df_clean['CustomerID'].fillna('GUEST').astype(str).str.strip()
+    df_clean.loc[df_clean['CustomerID'].isin(['', 'nan', 'None']), 'CustomerID'] = 'GUEST'
 
     # Save dirty records to quarantine for auditing
     if len(df_dirty) > 0:
         df_dirty.to_csv(quarantine_path, index=False)
-        print(f"Quarantined {len(df_dirty)} records with missing CustomerIDs or invalid prices to: {quarantine_path}")
+        print(f"Quarantined {len(df_dirty)} truly invalid records (unit price <= 0) to: {quarantine_path}")
 
     # 3. Clean Text Columns (Strip whitespace and convert to UPPERCASE)
     # This prevents duplicates like "red bag" vs "RED BAG" in SQL GROUP BY queries

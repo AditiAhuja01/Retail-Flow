@@ -59,8 +59,9 @@ def build_star_schema():
         );
     """)
     # Extract unique customer profiles
-    dim_cust_df = df[['CustomerID', 'Country']].drop_duplicates(subset=['CustomerID'])
+    dim_cust_df = df[['CustomerID', 'Country']].drop_duplicates(subset=['CustomerID']).copy()
     dim_cust_df.columns = ['customer_id', 'country']
+    dim_cust_df.loc[dim_cust_df['customer_id'] == 'GUEST', 'country'] = 'Unknown / Guest'
     dim_cust_df.to_sql('dim_customers', conn, if_exists='append', index=False)
 
     # 3. CREATE TABLE - dim_products (Dimension Table)

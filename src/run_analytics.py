@@ -93,7 +93,8 @@ def run_analytical_queries():
             ROUND(SUM(f.amount_inr), 2) AS lifetime_value_inr
         FROM fact_sales f
         JOIN dim_customers c ON f.customer_id = c.customer_id
-        WHERE f.is_returned = 0  -- Only count actual delivered purchases
+        WHERE f.is_returned = 0 
+          AND f.customer_id != 'GUEST'  -- Exclude anonymous guest checkouts from individual customer LTV
         GROUP BY f.customer_id, c.country
         ORDER BY lifetime_value_inr DESC
         LIMIT 10;
@@ -119,6 +120,7 @@ def run_analytical_queries():
             END AS customer_segment
         FROM fact_sales
         WHERE is_returned = 0
+          AND customer_id != 'GUEST'  -- Exclude anonymous guest checkouts from customer cohort segmentation
         GROUP BY customer_id
         ORDER BY monetary_value DESC;
     """

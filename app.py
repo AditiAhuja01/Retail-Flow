@@ -201,7 +201,7 @@ st.markdown("""
 # Status Pills
 st.markdown(f"""
     <div style="margin-bottom: 18px;">
-        <span class="status-pill"><b>Data Quality:</b> 401,564 Clean | 135,077 Quarantined (24.9%)</span>
+        <span class="status-pill"><b>Data Quality:</b> 534,129 Clean | 2,512 Quarantined (0.5%)</span>
         <span class="status-pill"><b>Currency Conversion:</b> 1 GBP = Rs. {forex_rate:.2f}</span>
     </div>
 """, unsafe_allow_html=True)
@@ -226,7 +226,7 @@ with k1:
         <div class="kpi-card">
             <div class="kpi-label">Completed Orders</div>
             <div class="kpi-value">{total_orders:,}</div>
-            <div class="kpi-sub">Across 401,564 purchased items</div>
+            <div class="kpi-sub">Across 534,129 purchased items</div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -429,7 +429,7 @@ with tab2:
         st.markdown("""
             <div class="summary-box">
                 <div class="summary-heading">Key Finding</div>
-                <div class="summary-text">Kitchen & Dining (3.1%) and Lighting & Decor (2.9%) exhibit the highest return rates across the product portfolio.</div>
+                <div class="summary-text">Kitchen & Dining (2.3%) and Lighting & Decor (2.3%) exhibit the highest return rates across the product portfolio.</div>
                 <div class="summary-heading">Operational Action</div>
                 <div class="summary-text">Conduct supplier quality reviews and improve packaging for fragile SKUs to reduce return volumes and reverse freight costs.</div>
             </div>
