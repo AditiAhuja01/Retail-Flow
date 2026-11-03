@@ -21,7 +21,7 @@ An automated data platform and dimensional warehouse that processes 540,000+ tra
 ---
 ---
 
-## 1. Business Problem & Impact (Product Context)
+## 1. Business Problem & Impact
 
 Retail platforms face significant profit leakage and reporting inaccuracy due to three factors:
 
@@ -51,7 +51,7 @@ flowchart LR
 
 ---
 
-## 3. Data Warehouse Design (Kimball Star Schema)
+## 3. Data Warehouse Design
 
 The warehouse structures transactional facts and dimensional context for analytical queries:
 
