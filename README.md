@@ -6,11 +6,19 @@ An automated data platform and dimensional warehouse that processes 540,000+ tra
 
 ---
 
+
 ## Dashboard Preview
 
-<!-- Replace with your dashboard screenshot path, e.g. docs/dashboard_preview.png -->
-![RetailFlow Dashboard Preview](docs/dashboard_preview.png)
+### Revenue Trends
+![Revenue Trends](docs/revenue-trends.png)
 
+### Product Returns
+![Product Returns](docs/product-returns.png)
+
+### Customer Segments
+![Customer Segments](docs/customer-segments.png)
+
+---
 ---
 
 ## 1. Business Problem & Impact (Product Context)
